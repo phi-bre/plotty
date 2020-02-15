@@ -1,6 +1,6 @@
-const density = 100;
+const density = 1000;
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
 const renderer = new THREE.WebGLRenderer();
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -14,7 +14,7 @@ init();
 function init() {
     const geometry = new THREE.BufferGeometry();
     const material = new THREE.PointsMaterial({
-        size: 0.1,
+        size: 0.05,
         color: 'white',
     });
     const points = new THREE.Points(geometry, material);
@@ -35,8 +35,7 @@ function init() {
         });
 
     renderer.domElement.addEventListener('wheel', e => {
-        console.log(controls.target.distanceTo(controls.object.position))
-        material.size = controls.target.distanceTo(controls.object.position) / 100;
+        material.size = controls.target.distanceTo(controls.object.position) / 500;
     }, false);
 }
 
