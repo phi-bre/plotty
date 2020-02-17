@@ -1,8 +1,11 @@
-const density = 100;
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
-const renderer = new THREE.WebGLRenderer();
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+import {BufferGeometry, PerspectiveCamera, Points, PointsMaterial, Scene, Vector3, WebGLRenderer} from "three";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+
+const density = 1000;
+const scene = new Scene();
+const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
+const renderer = new WebGLRenderer();
+const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableZoom = false;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -15,18 +18,18 @@ init();
 function init() {
     let total = 0;
     let zoom = 1;
-    const geometry = new THREE.BufferGeometry();
-    const material = new THREE.PointsMaterial({
+    const geometry = new BufferGeometry();
+    const material = new PointsMaterial({
         size: 0.05,
         color: 'white',
     });
-    const points = new THREE.Points(geometry, material);
+    const points = new Points(geometry, material);
     scene.add(points);
 
     register((channel, registration) => {
         channel.port1.onmessage = event => {
-            const points = event.data.map(point => new THREE.Vector3(...point));
-            const buffer = new THREE.BufferGeometry().setFromPoints(points);
+            const points = event.data.map(point => new Vector3(...point));
+            const buffer = new BufferGeometry().setFromPoints(points);
             geometry.merge(buffer, total);
             total += event.data.length;
             console.log(total, event.data.length);
@@ -36,7 +39,6 @@ function init() {
     });
 
     renderer.domElement.addEventListener('wheel', e => {
-        // material.size = controls.target.distanceTo(controls.object.position) / 500;
         zoom += e.deltaY / 100;
         points.scale.set(zoom, zoom, zoom);
     }, false);
@@ -49,7 +51,7 @@ function animate() {
 }
 
 async function register(callback) {
-    const registration = await navigator.serviceWorker.register('src/service-worker.js');
+    const registration = await navigator.serviceWorker.register('service-worker.js');
     if (registration.active) {
         const channel = new MessageChannel();
         callback(channel, registration);
