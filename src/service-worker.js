@@ -8,13 +8,13 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('message', event => {
-    console.log('started');
-    const points = [];
+    let points = [];
+    setInterval(() => {
+        event.ports[0].postMessage(points);
+        points.length = 0;
+    }, 1000);
     for (const point of mandelbrot(event.data)) {
         points.push(point);
-        if (points.length % 1.0E200) {
-            event.ports[0].postMessage(points);
-        }
     }
 });
 
@@ -34,7 +34,7 @@ function* mandelbrot(width, height = width, ox = 0, oy = 0) {
                 y = 2 * x * y + y0;
                 x = temp;
             }
-            if (z-1 === max) yield [x, y, z / 1000];
+            if (z > max) yield [x, y, z / 1000];
         }
     }
 }
