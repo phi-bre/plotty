@@ -15,10 +15,45 @@ controls.addEventListener('change', () => {
     renderer.render(scene, camera);
 });
 
-const points = [...g(t => {
-    const z = (Math.E ** Math.cos(t) - 2 * Math.cos(4 * t) - (Math.sin(5) * (t / 12)));
-    return new THREE.Vector3(Math.sin(t) * z, Math.cos(t) * z, z);
-}, 0, 12 * Math.PI)];
+// const range = document.createElement('input');
+// range.type = 'range';
+// range.oninput = () => {
+//     console.log(range.value);
+//     update(range.value);
+// }
+// range.style.position = 'fixed';
+// range.style.zIndex = '10';
+// range.style.top = 0;
+// range.style.left = 0;
+// range.min = 0;
+// range.max = 1;
+// range.step = 0.00001;
+// document.body.appendChild(range);
+
+let a = 0;
+let d = 0.001;
+setInterval(() => {
+    a += d;
+    if (a >= 1 || a <= -1) d = -d;
+    update(a);
+}, 16);
+
+update();
+
+function update(a = 0) {
+    scene.remove(...scene.children);
+    const points = [...g(t => {
+        const z = (Math.E ** Math.cos(t) - 2 * Math.cos(4 * t) - (Math.sin(5) * (t / 12)));
+        return new THREE.Vector3(Math.sin(t * a) * z, Math.cos(t * a) * z, z);
+    }, 0, 12 * Math.PI)];
+
+    const line = new MeshLine();
+    line.setPoints(points);
+    const material = new MeshLineMaterial({ lineWidth : 0.05, color: '#3498db' });
+    const mesh = new THREE.Mesh(line, material);
+    scene.add(mesh);
+    renderer.render(scene, camera);
+}
 
 // const curve = [
 //     new THREE.Vector3(0.30959752321981426, 0.7575757575757576),
@@ -91,11 +126,11 @@ function g(f, min = 0, max = 1) {
     // mesh.scale.addScalar(50);
     // scene.add(mesh);
 
-    const line = new MeshLine();
-    line.setPoints(points);
-    const material = new MeshLineMaterial({ lineWidth : 0.05, color: '#3498db' });
-    const mesh = new THREE.Mesh(line, material);
-    scene.add(mesh);
+    // const line = new MeshLine();
+    // line.setPoints(points);
+    // const material = new MeshLineMaterial({ lineWidth : 0.05, color: '#3498db' });
+    // const mesh = new THREE.Mesh(line, material);
+    // scene.add(mesh);
 }
 
 // {
@@ -114,5 +149,3 @@ function g(f, min = 0, max = 1) {
 //
 //     scene.add(back, front);
 // }
-
-renderer.render(scene, camera);
