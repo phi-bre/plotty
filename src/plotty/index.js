@@ -11,7 +11,7 @@ renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
 camera.position.set(0, 20, 100);
 controls.addEventListener('change', () => {
-    renderer.render(scene, camera);
+  renderer.render(scene, camera);
 });
 
 // const range = document.createElement('input');
@@ -32,11 +32,11 @@ controls.addEventListener('change', () => {
 const points = [...mandelbrot(100)];
 const geometry = new THREE.BufferGeometry().setFromPoints(points);
 const material = new THREE.PointsMaterial({
-    size: 0.01,
-    color: 'white',
-    sizeAttenuation: false,
-    opacity: 0.1,
-    transparent: true
+  size: 0.01,
+  color: 'white',
+  sizeAttenuation: false,
+  opacity: 0.1,
+  transparent: true,
 });
 const mesh = new THREE.Points(geometry, material);
 scene.add(mesh);
@@ -93,12 +93,14 @@ renderer.render(scene, camera);
 // const points = g((x, y) => new THREE.Vector3(x, 0));
 
 function g(f, min = 0, max = 1) {
-    const p1 = f(min), p2 = f(max), distance = p1.distanceTo(p2);
-    if (distance > 0.1 || distance < 0.00000001) {
-        return [...g(f, min, (min + max) / 2), ...g(f, (min + max) / 2, max)];
-    } else {
-        return [p1];
-    }
+  const p1 = f(min),
+    p2 = f(max),
+    distance = p1.distanceTo(p2);
+  if (distance > 0.1 || distance < 0.00000001) {
+    return [...g(f, min, (min + max) / 2), ...g(f, (min + max) / 2, max)];
+  } else {
+    return [p1];
+  }
 }
 
 // function* generate(f, min = 0, max = 1) {
@@ -131,16 +133,15 @@ function g(f, min = 0, max = 1) {
 // scene.add(line);
 
 {
-    // const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    // // geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(points.map((p, i) => [1, i / points.length * 2, i / points.length]).flat()), 3, false));
-    // // const material = new THREE.PointsMaterial({ size: 0.01, color: 'white' });
-    // const mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: '#3498db', /* vertexColors: THREE.VertexColors */ }));
-    // mesh.scale.addScalar(50);
-    // scene.add(mesh);
-
-    // const line = new MeshLine();
-    // line.setPoints(points);
-    // const material = new MeshLineMaterial({ lineWidth : 0.05, color: '#3498db' });
-    // const mesh = new THREE.Mesh(line, material);
-    // scene.add(mesh);
+  // const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  // // geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(points.map((p, i) => [1, i / points.length * 2, i / points.length]).flat()), 3, false));
+  // // const material = new THREE.PointsMaterial({ size: 0.01, color: 'white' });
+  // const mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: '#3498db', /* vertexColors: THREE.VertexColors */ }));
+  // mesh.scale.addScalar(50);
+  // scene.add(mesh);
+  // const line = new MeshLine();
+  // line.setPoints(points);
+  // const material = new MeshLineMaterial({ lineWidth : 0.05, color: '#3498db' });
+  // const mesh = new THREE.Mesh(line, material);
+  // scene.add(mesh);
 }

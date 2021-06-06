@@ -105,5 +105,9 @@ dist
 # TernJS port file
 .tern-port
 
-.idea/
-dist/
+.idea
+.DS_Store
+/.svelte-kit
+/package
+/.svelte
+/.vercel_build_output
