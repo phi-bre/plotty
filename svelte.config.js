@@ -1,8 +1,8 @@
 import vercel from '@sveltejs/adapter-vercel';
 
 export default {
-  adapter: vercel(),
   kit: {
+    adapter: vercel(),
     target: '#svelte',
     ssr: false,
   },
