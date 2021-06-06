@@ -1,4 +1,4 @@
-const vercel = require('@sveltejs/adapter-vercel');
+import vercel from '@sveltejs/adapter-vercel';
 
 export default {
   adapter: vercel(),
