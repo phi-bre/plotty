@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ConvexBufferGeometry, ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry';
-import { MeshLine, MeshLineMaterial, MeshLineRaycast } from 'three.meshline';
+import { mandelbrot } from './algorithms';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
@@ -30,30 +29,43 @@ controls.addEventListener('change', () => {
 // range.step = 0.00001;
 // document.body.appendChild(range);
 
-let a = 0;
-let d = 0.001;
-setInterval(() => {
-    a += d;
-    if (a >= 1 || a <= -1) d = -d;
-    update(a);
-}, 16);
+const points = [...mandelbrot(100)];
+const geometry = new THREE.BufferGeometry().setFromPoints(points);
+const material = new THREE.PointsMaterial({
+    size: 0.01,
+    color: 'white',
+    sizeAttenuation: false,
+    opacity: 0.1,
+    transparent: true
+});
+const mesh = new THREE.Points(geometry, material);
+scene.add(mesh);
+renderer.render(scene, camera);
 
-update();
-
-function update(a = 0) {
-    scene.remove(...scene.children);
-    const points = [...g(t => {
-        const z = (Math.E ** Math.cos(t) - 2 * Math.cos(4 * t) - (Math.sin(5) * (t / 12)));
-        return new THREE.Vector3(Math.sin(t * a) * z, Math.cos(t * a) * z, z);
-    }, 0, 12 * Math.PI)];
-
-    const line = new MeshLine();
-    line.setPoints(points);
-    const material = new MeshLineMaterial({ lineWidth : 0.05, color: '#3498db' });
-    const mesh = new THREE.Mesh(line, material);
-    scene.add(mesh);
-    renderer.render(scene, camera);
-}
+// let a = 0;
+// let d = 0.001;
+// setInterval(() => {
+//     a += d;
+//     if (a >= 1 || a <= -1) d = -d;
+//     update(a);
+// }, 16);
+//
+// update();
+//
+// function update(a = 0) {
+//     scene.remove(...scene.children);
+//     const points = [...g(t => {
+//         const z = (Math.E ** Math.cos(t) - 2 * Math.cos(4 * t) - (Math.sin(5) * (t / 12)));
+//         return new THREE.Vector3(Math.sin(t * a) * z, Math.cos(t * a) * z, z);
+//     }, 0, 12 * Math.PI)];
+//
+//     const line = new MeshLine();
+//     line.setPoints(points);
+//     const material = new MeshLineMaterial({ lineWidth : 0.05, color: '#3498db' });
+//     const mesh = new THREE.Mesh(line, material);
+//     scene.add(mesh);
+//     renderer.render(scene, camera);
+// }
 
 // const curve = [
 //     new THREE.Vector3(0.30959752321981426, 0.7575757575757576),
@@ -132,20 +144,3 @@ function g(f, min = 0, max = 1) {
     // const mesh = new THREE.Mesh(line, material);
     // scene.add(mesh);
 }
-
-// {
-//     const geometry = new ConvexBufferGeometry(points);
-//     const material = new THREE.MeshBasicMaterial({ color: 'green' });
-//
-//     const back = new THREE.Mesh(geometry, material);
-//     back.material.side = THREE.BackSide;
-//     back.scale.addScalar(50);
-//     back.renderOrder = 0;
-//
-//     const front = new THREE.Mesh(geometry, material.clone());
-//     back.material.side = THREE.FrontSide;
-//     front.scale.addScalar(50);
-//     front.renderOrder = 1;
-//
-//     scene.add(back, front);
-// }
