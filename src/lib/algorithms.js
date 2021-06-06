@@ -1,5 +1,3 @@
-import { Vector3 } from 'three';
-
 function map(value, from, to, min, max) {
   return ((value - from) * (max - min)) / (to - from) + min;
 }
@@ -18,8 +16,8 @@ export function* mandelbrot(precision = 100, depth = 100) {
         zr = temp;
         if (i > 2) {
           // Only include points that are part of the set
-          yield new Vector3(x, +y, zr);
-          yield new Vector3(x, -y, zr);
+          yield [x, +y, zr];
+          yield [x, -y, zr];
         }
       }
     }
