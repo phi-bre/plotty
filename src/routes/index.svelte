@@ -28,6 +28,7 @@
         const iterator = mandelbrot(precision, depth);
         const material = new THREE.PointsMaterial({
           size: 0.01,
+          size: 1,
           color: "white",
           sizeAttenuation: false,
           opacity: 0.1,
