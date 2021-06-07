@@ -9,7 +9,7 @@
 
   let canvas, resize, generate, interval, THREE;
   let scene, camera, renderer, controls;
-  let precision = 1000, depth = 10, batch = 10000;
+  let precision = 300, depth = 50, batch = 10000;
 
   if (browser) {
     onMount(async () => {
@@ -19,7 +19,7 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        // renderer.setPixelRatio(window.devicePixelRatio);
         renderer.render(scene, camera);
       }
 
@@ -74,7 +74,7 @@
 <div class="menu">
   <input type="range" min="1" max="100000" bind:value={batch} on:input={generate}>
   <input type="range" min="1" max="1000" bind:value={precision} on:input={generate}>
-  <input type="range" min="1" max="1000" bind:value={depth} on:input={generate}>
+  <input type="range" min="4" max="1000" bind:value={depth} on:input={generate}>
 </div>
 
 <style>
