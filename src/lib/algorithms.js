@@ -11,13 +11,13 @@ export function* mandelbrot(precision = 100, depth = 100) {
         zi = 0,
         i = 0;
       while (zr * zr + zi * zi <= 4 && i++ < depth) {
-        const temp = zr * zr - zi * zi + x;
+        const z = zr * zr - zi * zi + x;
         zi = 2 * zr * zi + y;
-        zr = temp;
+        zr = z;
         if (i > 2) {
           // Only include points that are part of the set
-          yield [x, +y, zr];
-          yield [x, -y, zr];
+          yield [x, +y, z];
+          yield [x, -y, z];
         }
       }
     }
