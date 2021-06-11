@@ -1,15 +1,22 @@
 import * as THREE from './three';
-import { batched, evaluate, mandelbrot } from "./algorithms";
+import { evaluate } from './algorithms';
 
 export class Mandelbrot {
   constructor(canvas) {
     this.blub = true;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
     // this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
-    this.camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / -2, window.innerHeight / 2, Number.MIN_VALUE, Number.MAX_VALUE);
+    this.camera = new THREE.OrthographicCamera(
+      window.innerWidth / -2,
+      window.innerWidth / 2,
+      window.innerHeight / -2,
+      window.innerHeight / 2,
+      Number.MIN_VALUE,
+      Number.MAX_VALUE,
+    );
     // this.camera.position.set(0, 0, 100);
     this.camera.lookAt(0, 0, 0);
-    this.camera.zoom = 200;
+    this.camera.zoom = 1;
     const controls = new THREE.OrbitControls(this.camera, canvas);
     controls.enableRotate = true;
     controls.screenSpacePanning = true;
@@ -17,26 +24,72 @@ export class Mandelbrot {
     // controls.touches = { ONE: THREE.TOUCH.DOLLY_PAN };
 
     this.scene = new THREE.Scene();
-    this.geometry = new THREE.BufferGeometry();
-    this.material = new THREE.PointsMaterial({
-      size: 4,
-      color: "white",
-      // vertexColors: true,
-      sizeAttenuation: false,
-      opacity: 0.1,
-      transparent: true
+    // this.geometry = new THREE.BufferGeometry();
+    // this.material = new THREE.PointsMaterial({
+    //   size: 4,
+    //   color: "white",
+    //   // vertexColors: true,
+    //   sizeAttenuation: false,
+    //   opacity: 0.1,
+    //   transparent: true
+    // });
+    // this.mesh = new THREE.Points(this.geometry, this.material);
+    // // this.mesh.scale.addScalar(100);
+    // this.scene.add(this.mesh);
+
+    this.material = new THREE.ShaderMaterial({
+      uniforms: {
+        resolution: {
+          type: 'v2',
+          value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+        },
+      },
+      vertexShader: `
+        uniform vec2 resolution;
+        void main() {
+          gl_Position = vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec2 resolution;
+        void main() {
+          const float scale = 1.0;
+          const int depth = 100;
+          int iteration = 0;
+          float zr = 0.0;
+          float zi = 0.0;
+          float x = (gl_FragCoord.x - resolution.x / 2.0) / scale;
+          float y = (gl_FragCoord.y - resolution.y / 2.0) / scale;
+          for (int i = 0; i < 100; i++) {
+            if (zr * zr + zi * zi <= 4.0) {
+              float z = zr * zr - zi * zi + x;
+              zi = 2.0 * zr * zi + y;
+              zr = z;
+              iteration = i;
+            }
+          }
+          float c = 1.0 / float(depth) * float(iteration);
+          if (x < resolution.x / 4.0 && y < 10.0 && x > 0.0 && y > 0.0) {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+          }
+        }
+      `,
     });
-    this.mesh = new THREE.Points(this.geometry, this.material);
-    // this.mesh.scale.addScalar(100);
+    this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.material);
     this.scene.add(this.mesh);
 
-    window.addEventListener("resize", this.resize.bind(this), false);
-    controls.addEventListener("change", () => {
-      this.update();
-      // this.renderer.render(this.scene, this.camera);
-    });
+    window.addEventListener('resize', this.resize.bind(this), false);
+    // controls.addEventListener('change', () => {
+    //   this.update();
+    //   // this.renderer.render(this.scene, this.camera);
+    // });
     this.resize();
-    this.update();
+    this.render();
+    // this.update();
+  }
+
+  render() {
+    this.renderer.render(this.scene, this.camera);
   }
 
   resize() {
@@ -60,9 +113,9 @@ export class Mandelbrot {
     const height = window.innerHeight * precision;
     for (let i = 0; i < width; i++) {
       for (let j = 0; j < height; j++) {
-        const ex = x + (i - width / 2) * depth / precision;
-        const ey = y + (j - height / 2) * depth / precision;
-        for (const point of evaluate(ex, ey, 10)) {
+        const ex = x + ((i - width / 2) * depth) / precision;
+        const ey = y + ((j - height / 2) * depth) / precision;
+        for (const point of evaluate(ex, ey, 100)) {
           values.push(new THREE.Vector3(...point));
         }
       }
