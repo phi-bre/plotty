@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
   import { browser } from "$app/env";
 
-  let canvas, mandelbrot, precision = 300, depth = 50, batch = 100000, blub = true;
+  let canvas, mandelbrot, precision = 300, batch = 100000, blub = true;
 
   if (browser) {
     onMount(async () => {
@@ -14,18 +14,14 @@
       mandelbrot = new Mandelbrot(canvas);
     });
   }
-
-  function update() {
-    if (mandelbrot) {
-      mandelbrot.blub = blub;
-    }
-  }
 </script>
 
-<canvas bind:this={canvas} />
+<canvas bind:this={canvas} on:wheel={event => mandelbrot.scale = -event.deltaY} />
 <div class="menu">
-  <input type="checkbox" bind:checked={blub} on:change={update}>
-<!--  <input type="range" min="1" max="100000" bind:value={batch} on:input={update}>-->
+<!--  <input type="checkbox" bind:checked={blub} on:change={update}>-->
+  {#if mandelbrot}
+    <input type="range" min="1" max="400" bind:value={mandelbrot.depth}>
+  {/if}
 <!--  <input type="range" min="1" max="1000" bind:value={precision} on:input={update}>-->
 <!--  <input type="range" min="4" max="1000" bind:value={depth} on:input={update}>-->
 </div>

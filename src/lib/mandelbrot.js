@@ -5,20 +5,20 @@ export class Mandelbrot {
   constructor(canvas) {
     this.blub = true;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
-    // this.camera = new THREE.OrthographicCamera(
-    //   window.innerWidth / -2,
-    //   window.innerWidth / 2,
-    //   window.innerHeight / -2,
-    //   window.innerHeight / 2,
-    //   Number.MIN_VALUE,
-    //   Number.MAX_VALUE,
-    // );
-    this.camera.position.set(0, 0, 100);
+    // this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
+    this.camera = new THREE.OrthographicCamera(
+      window.innerWidth / -2,
+      window.innerWidth / 2,
+      window.innerHeight / -2,
+      window.innerHeight / 2,
+      Number.MIN_VALUE,
+      Number.MAX_VALUE,
+    );
+    // this.camera.position.set(0, 0, 100);
     this.camera.lookAt(0, 0, 0);
     // this.camera.zoom = 1;
     const controls = new THREE.OrbitControls(this.camera, canvas);
-    controls.enableRotate = true;
+    controls.enableRotate = false;
     controls.screenSpacePanning = true;
     // controls.mouseButtons = { LEFT: THREE.MOUSE.PAN };
     // controls.touches = { ONE: THREE.TOUCH.DOLLY_PAN };
@@ -37,13 +37,21 @@ export class Mandelbrot {
     // // this.mesh.scale.addScalar(100);
     // this.scene.add(this.mesh);
 
-    // const geometry = new THREE.SphereGeometry(5, 32, 32);
+    // const geometry = new THREE.SphereGeometry(0.5, 32, 32);
     // const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
     // const sphere = new THREE.Mesh(geometry, material);
     // this.scene.add(sphere);
 
     this.material = new THREE.ShaderMaterial({
       uniforms: {
+        scale: {
+          type: 'float',
+          value: 200,
+        },
+        depth: {
+          type: 'int',
+          value: 100,
+        },
         resolution: {
           type: 'v2',
           value: new THREE.Vector2(window.innerWidth, window.innerHeight),
@@ -56,29 +64,25 @@ export class Mandelbrot {
         }
       `,
       fragmentShader: `
+        uniform int depth;
+        uniform float scale;
         uniform vec2 resolution;
+
         void main() {
-          const float scale = 300.0;
-          const int depth = 100;
           int iteration = 0;
-          vec2 location = ((gl_FragCoord.xy - resolution / 2.0) /*+ vec2(viewMatrix)*/) / scale;
-          
-          if (location.x < -2.5 || location.x > 1.0 || location.y < -1.0 || location.y > 2.0) return;
-          
-          float zr = 0.0;
-          float zi = 0.0;
-          for (int i = 0; i < 100 && (zr * zr + zi * zi <= 4.0); i++) {
-            float z = zr * zr - zi * zi + location.x;
-            zi = 2.0 * zr * zi + location.y;
-            zr = z;
+          vec2 location = (cameraPosition.xy * vec2(1.0, -1.0) + gl_FragCoord.xy - resolution / 2.0) / scale;
+          vec2 z = vec2(.0);
+          for (int i = 0; i < 100; i++) {
+            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + location;
             iteration = i;
+            if (dot(z, z) > 4.0) break;
           }
           float c = 1.0 / float(depth) * float(iteration);
           gl_FragColor = vec4(c, c, c, 1.0);
         }
       `,
     });
-    this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.material);
+    this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(100000, 100000), this.material);
     this.scene.add(this.mesh);
 
     window.addEventListener('resize', this.resize.bind(this), false);
@@ -87,9 +91,28 @@ export class Mandelbrot {
       // this.update();
       // this.renderer.render(this.scene, this.camera);
     });
+    // window.addEventListener('wheel', event => {
+    //   console.log(this.material.uniforms.scale.value);
+    //   this.material.uniforms.scale.value += event.deltaY * -0.01;
+    // });
     this.resize();
     this.render();
     // this.update();
+  }
+
+  get depth() {
+    return this.material.uniforms.depth.value;
+  }
+
+  set depth(value) {
+    this.material.uniforms.depth.value = value;
+    this.render();
+  }
+
+  set scale(value) {
+    console.log(value);
+    this.material.uniforms.scale.value += value;
+    this.render();
   }
 
   render() {
