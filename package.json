@@ -1,6 +1,7 @@
 {
   "name": "plotty",
   "version": "0.0.1",
+  "type": "module",
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",
@@ -8,8 +9,7 @@
     "format": "prettier --write --plugin-search-dir=. ."
   },
   "dependencies": {
-    "three": "^0.125.0",
-    "three.meshline": "^1.3.0"
+    "three": "^0.125.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-vercel": "next",
@@ -17,6 +17,5 @@
     "prettier": "~2.2.1",
     "prettier-plugin-svelte": "^2.2.0",
     "svelte": "^3.34.0"
-  },
-  "type": "module"
+  }
 }

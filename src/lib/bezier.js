@@ -76,41 +76,50 @@ export class Bezier {
   update() {
     this.scene.remove(...this.scene.children);
 
-    const curveGeometry = new THREE.MeshLine();
-    curveGeometry.setPoints(bezier(this.bezier, 100));
-    const curveMaterial = new THREE.MeshLineMaterial({ lineWidth: 0.01, color: '#3498db' });
-    const curve = new THREE.Mesh(curveGeometry, curveMaterial);
+    const curveGeometry = new THREE.LineGeometry().fromLine({
+      geometry: new THREE.BufferGeometry().setFromPoints(bezier(this.bezier, 100)),
+    });
+    const curveMaterial = new THREE.LineMaterial({
+      resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
+      linewidth: 4,
+      color: '#3498db',
+    });
+    const curve = new THREE.LineSegments2(curveGeometry, curveMaterial);
 
     const controls = this.bezier.map((point) => {
-      const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.01), new THREE.MeshBasicMaterial({ color: '#8b8b8b' }));
+      const sphereGeometry = new THREE.SphereGeometry(0.005);
+      const sphereMaterial = new THREE.MeshBasicMaterial({ color: '#8b8b8b' });
+      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
       sphere.position.copy(point);
       return sphere;
     });
 
-    const outlineGeometry = new THREE.MeshLine();
-    outlineGeometry.setPoints(this.bezier);
-    const outlineMaterial = new THREE.MeshLineMaterial({
-      lineWidth: 0.01,
-      color: '#8b8b8b',
-      depthTest: false,
+    const outlineGeometry = new THREE.LineGeometry().fromLine({
+      geometry: new THREE.BufferGeometry().setFromPoints(this.bezier),
+    });
+    const outlineMaterial = new THREE.LineMaterial({
+      resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
+      linewidth: 3,
+      color: 0x8b8b8b,
       transparent: true,
       opacity: 0.5,
     });
-    const outline = new THREE.Mesh(outlineGeometry, outlineMaterial);
+    const outline = new THREE.LineSegments2(outlineGeometry, outlineMaterial);
 
     const triangulated = triangulate(this.bezier, this.parameter);
     const sliders = triangulated.sliders.map((slider, i) => {
       const color = colors[i % colors.length];
-      const sliderGeometry = new THREE.MeshLine();
-      sliderGeometry.setPoints(slider);
-      const sliderMaterial = new THREE.MeshLineMaterial({
+      const sliderGeometry = new THREE.LineGeometry().fromLine({
+        geometry: new THREE.BufferGeometry().setFromPoints(slider),
+      });
+      const sliderMaterial = new THREE.LineMaterial({
         color,
-        lineWidth: 0.005,
-        depthTest: false,
+        resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
+        linewidth: 3,
         transparent: true,
         opacity: 0.5,
       });
-      const sliderMesh = new THREE.Mesh(sliderGeometry, sliderMaterial);
+      const sliderMesh = new THREE.LineSegments2(sliderGeometry, sliderMaterial);
 
       for (const point of slider) {
         const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.005), new THREE.MeshBasicMaterial({ color }));
