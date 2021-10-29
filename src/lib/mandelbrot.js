@@ -48,6 +48,10 @@ export class Mandelbrot {
           type: 'float',
           value: 200,
         },
+        position: {
+          type: 'v2',
+          value: new THREE.Vector2(0, 0),
+        },
         depth: {
           type: 'int',
           value: 100,
@@ -67,13 +71,14 @@ export class Mandelbrot {
         uniform int depth;
         uniform float scale;
         uniform vec2 resolution;
+        uniform vec2 position;
 
         void main() {
           int iteration = 0;
-          vec2 location = (cameraPosition.xy * vec2(1.0, -1.0) + gl_FragCoord.xy - resolution / 2.0) / scale;
-          vec2 z = vec2(.0);
-          for (int i = 0; i < 100; i++) {
-            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + location;
+          vec2 z = (cameraPosition.xy * vec2(1.0, -1.0) + gl_FragCoord.xy - resolution / 2.0) / scale;
+          vec2 location = position;
+          for (int i = 0; i < depth; i++) {
+            z = vec2(2.0 * z.x * z.y, z.x * z.x - z.y * z.y) + location;
             iteration = i;
             if (dot(z, z) > 4.0) break;
           }
@@ -84,6 +89,13 @@ export class Mandelbrot {
     });
     this.mesh = new THREE.Mesh(new THREE.PlaneGeometry(100000, 100000), this.material);
     this.scene.add(this.mesh);
+
+    window.addEventListener('mousemove', event => {
+      const x = (event.x - window.innerWidth) / window.innerWidth;
+      const y = (event.y - window.innerHeight) / window.innerHeight;
+      this.material.uniforms.position.value = new THREE.Vector2(x, y);
+      this.render();
+    });
 
     window.addEventListener('resize', this.resize.bind(this), false);
     controls.addEventListener('change', () => {
