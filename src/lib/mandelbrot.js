@@ -78,11 +78,22 @@ export class Mandelbrot {
           vec2 z = (cameraPosition.xy * vec2(1.0, -1.0) + gl_FragCoord.xy - resolution / 2.0) / scale;
           vec2 location = position;
           for (int i = 0; i < depth; i++) {
-            z = vec2(2.0 * z.x * z.y, z.x * z.x - z.y * z.y) + location;
+            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + location;
             iteration = i;
             if (dot(z, z) > 4.0) break;
           }
           float c = 1.0 / float(depth) * float(iteration);
+          
+//          int i2 = 0;
+//          vec2 l2 = (cameraPosition.xy * vec2(1.0, -1.0) + gl_FragCoord.xy - resolution / 2.0) / scale;
+//          vec2 z2 = vec2(0.0);
+//          for (int i = 0; i < depth; i++) {
+//            z2 = vec2(z2.x * z2.x - z2.y * z2.y, 2.0 * z2.x * z2.y) + l2;
+//            i2 = i;
+//            if (dot(z2, z2) > 4.0) break;
+//          }
+//          float c2 = 1.0 / float(depth) * float(i2);
+          
           gl_FragColor = vec4(c, c, c, 1.0);
         }
       `,
@@ -91,8 +102,9 @@ export class Mandelbrot {
     this.scene.add(this.mesh);
 
     window.addEventListener('mousemove', event => {
-      const x = (event.x - window.innerWidth) / window.innerWidth;
-      const y = (event.y - window.innerHeight) / window.innerHeight;
+      const x = (event.x - window.innerWidth / 2) / window.innerWidth * 2;
+      const y = (event.y - window.innerHeight / 2) / window.innerHeight * 2;
+      console.log(x, y);
       this.material.uniforms.position.value = new THREE.Vector2(x, y);
       this.render();
     });
