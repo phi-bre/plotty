@@ -1,43 +1,27 @@
 import * as neta from '@phibre/neta';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { plotter } from './plotter';
 
 export function julia(mouse, depth) {
   return neta
     .element({
       tag: 'canvas',
       styles: {
-        width: '100vw',
-        height: '100vh',
         display: 'block',
       },
     })
     .then((canvas) => {
-      const size = 4;
-      const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
-      const camera = new THREE.OrthographicCamera(
-        window.innerWidth / -size,
-        window.innerWidth / +size,
-        window.innerHeight / -size,
-        window.innerHeight / +size,
-        Number.MIN_VALUE,
-        Number.MAX_VALUE
-      );
-      camera.lookAt(0, 0, 0);
-      camera.zoom = 100;
-      const controls = new OrbitControls(camera, canvas);
-      controls.enableRotate = false;
-      controls.screenSpacePanning = true;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-      const scene = new THREE.Scene();
-
-      const juliaMaterial = new THREE.ShaderMaterial({
+      const plot = plotter({
+        canvas: canvas,
+        size: 100,
         uniforms: {
           depth: depth,
           scale: { value: 1 },
-          c: { value: new THREE.Vector2(0, 0) },
+          c: { value: [0, 0] },
         },
-        vertexShader: `
+        vertex: `
           varying vec3 pos;
   
           void main() {
@@ -45,7 +29,7 @@ export function julia(mouse, depth) {
             gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
           }
         `,
-        fragmentShader: `
+        fragment: `
           uniform int depth;
           uniform float scale;
           uniform vec2 c;
@@ -66,36 +50,22 @@ export function julia(mouse, depth) {
           }
         `,
       });
-      const juliaGeometry = new THREE.PlaneGeometry(size, size);
-      const juliaMesh = new THREE.Mesh(juliaGeometry, juliaMaterial);
-      juliaMesh.rotateY(Math.PI);
-      scene.add(juliaMesh);
-
-      // const grid = new THREE.GridHelper(size, size * 4, 0x121212, 0x080808);
-      // grid.rotateX(Math.PI / 2);
-      // scene.add(grid);
-
-      const resize = () => {
-        juliaMaterial.uniforms.scale.value = camera.zoom;
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.render(scene, camera);
-      };
 
       mouse.then((vector) => {
-        juliaMaterial.uniforms.c.value = vector;
-        renderer.render(scene, camera);
+        plot.material.uniforms.c.value = vector;
+        plot.renderer.render(plot.scene, plot.camera);
       });
 
       depth.then((depth) => {
-        juliaMaterial.uniforms.depth.value = depth;
-        renderer.render(scene, camera);
+        plot.material.uniforms.depth.value = depth;
+        plot.renderer.render(plot.scene, plot.camera);
       });
 
-      window.addEventListener('resize', resize, false);
-      controls.addEventListener('change', resize);
-      resize();
+      plot.controls.addEventListener('change', () => {
+        plot.material.uniforms.scale.value = plot.camera.zoom;
+      });
+
+      plot.renderer.render(plot.scene, plot.camera);
 
       return canvas;
     });

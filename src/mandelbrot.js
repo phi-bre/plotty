@@ -1,6 +1,6 @@
 import * as neta from '@phibre/neta';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { plotter } from './plotter';
 
 export function mandelbrot(mouse) {
   return neta
@@ -17,28 +17,14 @@ export function mandelbrot(mouse) {
     })
     .then((canvas) => {
       const size = 300;
-      const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
-      const camera = new THREE.OrthographicCamera(
-        canvas.width / -size,
-        canvas.width / +size,
-        canvas.height / -size,
-        canvas.height / +size,
-        Number.MIN_VALUE,
-        Number.MAX_VALUE
-      );
-      camera.lookAt(0, 0, 0);
-      const controls = new OrbitControls(camera, canvas);
-      controls.enableRotate = false;
-      controls.screenSpacePanning = true;
-
-      const scene = new THREE.Scene();
-
-      const mandelbrotMaterial = new THREE.ShaderMaterial({
+      const plot = plotter({
+        canvas: canvas,
+        size: size,
         uniforms: {
           depth: { value: 100 },
           scale: { value: 1 },
         },
-        vertexShader: `
+        vertex: `
           varying vec3 pos;
         
           void main() {
@@ -46,7 +32,7 @@ export function mandelbrot(mouse) {
             gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
           }
         `,
-        fragmentShader: `
+        fragment: `
           uniform int depth;
           uniform float scale;
           varying vec3 pos;
@@ -63,25 +49,19 @@ export function mandelbrot(mouse) {
           }
         `,
       });
-      const mandelbrotGeometry = new THREE.PlaneGeometry(size, size);
-      const mandelbrotMesh = new THREE.Mesh(
-        mandelbrotGeometry,
-        mandelbrotMaterial
-      );
-      mandelbrotMesh.rotateY(Math.PI);
-      scene.add(mandelbrotMesh);
 
       const grid = new THREE.GridHelper(size, 2);
       grid.rotateX(Math.PI / 2);
-      scene.add(grid);
+      plot.scene.add(grid);
 
       const geometry = new THREE.TorusGeometry(0.05, 0.01, 16, 100);
       const material = new THREE.MeshBasicMaterial({ color: 0x5dadff });
       const torus = new THREE.Mesh(geometry, material);
-      scene.add(torus);
+      plot.scene.add(torus);
+
       mouse.then((vector) => {
         torus.position.set(vector.x, vector.y, 0);
-        renderer.render(scene, camera);
+        plot.renderer.render(plot.scene, plot.camera);
       });
 
       let change = false;
@@ -95,18 +75,18 @@ export function mandelbrot(mouse) {
             ((event.offsetX - canvas.width / 2) / size) * 2,
             ((event.offsetY - canvas.height / 2) / size) * -2,
             0
-          ).unproject(camera);
+          ).unproject(plot.camera);
           mouse.set(new THREE.Vector2(position.x, position.y));
         });
       });
 
-      controls.addEventListener('change', (event) => {
-        mandelbrotMaterial.uniforms.scale.value = camera.zoom;
-        torus.scale.setLength(1 / camera.zoom);
-        renderer.render(scene, camera);
+      plot.controls.addEventListener('change', (event) => {
+        plot.material.uniforms.scale.value = plot.camera.zoom;
+        torus.scale.setLength(1 / plot.camera.zoom);
+        plot.renderer.render(plot.scene, plot.camera);
       });
 
-      renderer.render(scene, camera);
+      plot.renderer.render(plot.scene, plot.camera);
 
       return canvas;
     });

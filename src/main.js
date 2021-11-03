@@ -17,32 +17,6 @@ neta.document({
       },
       children: [
         mandelbrot(mouse),
-        // neta.element({
-        //   tag: 'input',
-        //   styles: {
-        //     width: '150px',
-        //   },
-        //   attributes: {
-        //     type: "number",
-        //     value: mouse.then(vector => vector.x),
-        //     onchange(event) {
-        //       mouse.set(new Vector2(event.target.value, mouse.value.y));
-        //     }
-        //   },
-        // }),
-        // neta.element({
-        //   tag: 'input',
-        //   styles: {
-        //     width: '150px',
-        //   },
-        //   attributes: {
-        //     type: "number",
-        //     value: mouse.then(vector => vector.y),
-        //     onchange(event) {
-        //       mouse.set(new Vector2(mouse.value.x, event.target.value));
-        //     }
-        //   },
-        // })
         neta.element({
           tag: 'input',
           styles: {
