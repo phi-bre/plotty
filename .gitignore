@@ -107,7 +107,3 @@ dist
 
 .idea
 .DS_Store
-/.svelte-kit
-/package
-/.svelte
-/.vercel_build_output

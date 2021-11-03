@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "baseUrl": "./sveltekit",
-    "paths": {
-      "$lib/*": ["src/lib/*"]
-    }
-  },
-  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.svelte"]
-}
