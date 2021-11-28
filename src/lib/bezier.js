@@ -108,8 +108,8 @@ export class Bezier {
     // CONTROL POINTS
     if (this.controlObjects) this.scene.remove(...this.controlObjects);
     this.controlObjects = this.bezier.map((point) => {
-      const sphereGeometry = new THREE.SphereGeometry(0.005);
-      const sphereMaterial = new THREE.MeshBasicMaterial({ color: '#8b8b8b' });
+      const sphereGeometry = new THREE.SphereGeometry(0.01);
+      const sphereMaterial = new THREE.MeshBasicMaterial({ color: 'red' });
       const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
       sphere.point = point;
       return sphere;
@@ -195,9 +195,10 @@ export class Bezier {
       this.transform.detach();
       this.controls.enabled = true;
     } else {
-      this.bezier.push(new THREE.Vector3(this.mouse.x, this.mouse.y));
-      this.create();
-      this.update();
+      // TODO: Fix issue while dragging
+      // this.bezier.push(new THREE.Vector3(this.mouse.x, this.mouse.y));
+      // this.create();
+      // this.update();
     }
     this.render();
   }

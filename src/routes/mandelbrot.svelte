@@ -83,4 +83,9 @@
         top: 10px;
         right: 10px;
     }
+
+    canvas {
+        min-width: 100vw;
+        min-height: 100vh;
+    }
 </style>

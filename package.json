@@ -9,6 +9,8 @@
     "format": "prettier --write --plugin-search-dir=. ."
   },
   "dependencies": {
+    "carbon-components-svelte": "^0.44.3",
+    "carbon-icons-svelte": "^10.33.0",
     "three": "^0.125.0"
   },
   "devDependencies": {
