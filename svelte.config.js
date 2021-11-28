@@ -5,5 +5,10 @@ export default {
     adapter: vercel(),
     target: '#svelte',
     ssr: false,
+    vite: {
+      // optimizeDeps: {
+      //   include: ['carbon-components-svelte', 'clipboard-copy'],
+      // },
+    },
   },
 };
