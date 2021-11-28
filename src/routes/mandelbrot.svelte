@@ -1,15 +1,13 @@
-<svelte:head>
-  <title>Plotty - Mandelbrot</title>
-</svelte:head>
-
 <script>
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
   import { browser } from '$app/env';
-  import { mandelbrot } from "../lib/algorithms";
+  import { mandelbrot } from '../lib/algorithms';
 
   let canvas, resize, generate, interval, THREE;
   let scene, camera, renderer, controls;
-  let precision = 300, depth = 50, batch = 10000;
+  let precision = 300,
+    depth = 50,
+    batch = 10000;
 
   if (browser) {
     onMount(async () => {
@@ -21,17 +19,17 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         // renderer.setPixelRatio(window.devicePixelRatio);
         renderer.render(scene, camera);
-      }
+      };
 
       generate = () => {
         scene.remove(...scene.children);
         const iterator = mandelbrot(precision, depth);
         const material = new THREE.PointsMaterial({
           size: 1,
-          color: "white",
+          color: 'white',
           sizeAttenuation: false,
           opacity: 0.1,
-          transparent: true
+          transparent: true,
         });
 
         clearInterval(interval);
@@ -53,15 +51,15 @@
           scene.add(mesh);
           renderer.render(scene, camera);
         }, 1);
-      }
+      };
 
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
       camera.position.set(0, 0, 100);
       renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
       controls = new THREE.OrbitControls(camera, renderer.domElement);
-      window.addEventListener("resize", resize, false);
-      controls.addEventListener("change", () => {
+      window.addEventListener('resize', resize, false);
+      controls.addEventListener('change', () => {
         renderer.render(scene, camera);
       });
       resize();
@@ -70,22 +68,26 @@
   }
 </script>
 
+<svelte:head>
+  <title>Plotty - Mandelbrot</title>
+</svelte:head>
+
 <canvas bind:this={canvas} />
 <div class="menu">
-  <input type="range" min="1" max="100000" bind:value={batch} on:input={generate}>
-  <input type="range" min="1" max="1000" bind:value={precision} on:input={generate}>
-  <input type="range" min="4" max="1000" bind:value={depth} on:input={generate}>
+  <input type="range" min="1" max="100000" bind:value={batch} on:input={generate} />
+  <input type="range" min="1" max="1000" bind:value={precision} on:input={generate} />
+  <input type="range" min="4" max="1000" bind:value={depth} on:input={generate} />
 </div>
 
 <style>
-    .menu {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-    }
+  .menu {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+  }
 
-    canvas {
-        min-width: 100vw;
-        min-height: 100vh;
-    }
+  canvas {
+    min-width: 100vw;
+    min-height: 100vh;
+  }
 </style>

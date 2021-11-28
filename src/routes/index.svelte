@@ -1,6 +1,6 @@
 <script>
-  import { goto } from "$app/navigation";
-  import "carbon-components-svelte/css/g100.css";
+  import { goto } from '$app/navigation';
+  import 'carbon-components-svelte/css/g100.css';
   import {
     Column,
     Content,
@@ -13,30 +13,30 @@
     StructuredListHead,
     StructuredListRow,
     Tag,
-    Tile
-  } from "carbon-components-svelte";
+    Tile,
+  } from 'carbon-components-svelte';
 </script>
 
 <Content>
-<!--  <Grid>-->
-<!--    <Row>-->
-<!--      <Column>-->
-<!--        <Tile>-->
-<!--          asdas-->
-<!--        </Tile>-->
-<!--      </Column>-->
-<!--      <Column>-->
-<!--        <Tile>-->
-<!--          asdas-->
-<!--        </Tile>-->
-<!--      </Column>-->
-<!--      <Column>-->
-<!--        <Tile>-->
-<!--          asdas-->
-<!--        </Tile>-->
-<!--      </Column>-->
-<!--    </Row>-->
-<!--  </Grid>-->
+  <!--  <Grid>-->
+  <!--    <Row>-->
+  <!--      <Column>-->
+  <!--        <Tile>-->
+  <!--          asdas-->
+  <!--        </Tile>-->
+  <!--      </Column>-->
+  <!--      <Column>-->
+  <!--        <Tile>-->
+  <!--          asdas-->
+  <!--        </Tile>-->
+  <!--      </Column>-->
+  <!--      <Column>-->
+  <!--        <Tile>-->
+  <!--          asdas-->
+  <!--        </Tile>-->
+  <!--      </Column>-->
+  <!--    </Row>-->
+  <!--  </Grid>-->
 
   <StructuredList selection ariaLabel="Plotty Pages">
     <StructuredListHead>
@@ -51,36 +51,32 @@
         <StructuredListCell>Mandelbrot</StructuredListCell>
         <StructuredListCell>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dui magna, finibus id tortor sed, aliquet
-          bibendum
-          augue. Aenean posuere sem vel euismod dignissim. Nulla ut cursus dolor. Pellentesque vulputate nisl a
-          porttitor
-          interdum.
+          bibendum augue. Aenean posuere sem vel euismod dignissim. Nulla ut cursus dolor. Pellentesque vulputate nisl a
+          porttitor interdum.
         </StructuredListCell>
         <StructuredListCell>
           <Tag type="blue">In progress</Tag>
         </StructuredListCell>
       </StructuredListRow>
-<!--      <StructuredListRow tabIndex={0} on:click={() => goto('butterfly')}>-->
-<!--        <StructuredListCell>Butterfly</StructuredListCell>-->
-<!--        <StructuredListCell>-->
-<!--          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dui magna, finibus id tortor sed, aliquet-->
-<!--          bibendum-->
-<!--          augue. Aenean posuere sem vel euismod dignissim. Nulla ut cursus dolor. Pellentesque vulputate nisl a-->
-<!--          porttitor-->
-<!--          interdum.-->
-<!--        </StructuredListCell>-->
-<!--        <StructuredListCell>-->
-<!--          <Tag type="green">Done</Tag>-->
-<!--        </StructuredListCell>-->
-<!--      </StructuredListRow>-->
+      <!--      <StructuredListRow tabIndex={0} on:click={() => goto('butterfly')}>-->
+      <!--        <StructuredListCell>Butterfly</StructuredListCell>-->
+      <!--        <StructuredListCell>-->
+      <!--          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dui magna, finibus id tortor sed, aliquet-->
+      <!--          bibendum-->
+      <!--          augue. Aenean posuere sem vel euismod dignissim. Nulla ut cursus dolor. Pellentesque vulputate nisl a-->
+      <!--          porttitor-->
+      <!--          interdum.-->
+      <!--        </StructuredListCell>-->
+      <!--        <StructuredListCell>-->
+      <!--          <Tag type="green">Done</Tag>-->
+      <!--        </StructuredListCell>-->
+      <!--      </StructuredListRow>-->
       <StructuredListRow tabIndex={0} on:click={() => goto('bezier')}>
         <StructuredListCell>Bézier</StructuredListCell>
         <StructuredListCell>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dui magna, finibus id tortor sed, aliquet
-          bibendum
-          augue. Aenean posuere sem vel euismod dignissim. Nulla ut cursus dolor. Pellentesque vulputate nisl a
-          porttitor
-          interdum.
+          bibendum augue. Aenean posuere sem vel euismod dignissim. Nulla ut cursus dolor. Pellentesque vulputate nisl a
+          porttitor interdum.
         </StructuredListCell>
         <StructuredListCell>
           <Tag type="blue">In progress</Tag>

@@ -1,15 +1,12 @@
-<svelte:head>
-  <title>Plotty - Butterfly</title>
-</svelte:head>
-
 <script>
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
   import { browser } from '$app/env';
 
   let canvas, resize, generate, interval, THREE;
   let scene, camera, renderer, controls;
-  let a = 1, f = 0, t = 12 * Math.PI;
-
+  let a = 1,
+    f = 0,
+    t = 12 * Math.PI;
 
   function g(f, min = 0, max = 1) {
     const p1 = f(min),
@@ -32,30 +29,36 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.render(scene, camera);
-      }
+      };
 
       generate = () => {
         scene.remove(...scene.children);
-        const points = [...g(t => {
-            const z = (Math.E ** Math.cos(t) - 2 * Math.cos(4 * t) - (Math.sin(5) * (t / 12)));
-            return new THREE.Vector3(Math.sin(t * a) * z, Math.cos(t * a) * z, z);
-        }, f, t)];
+        const points = [
+          ...g(
+            (t) => {
+              const z = Math.E ** Math.cos(t) - 2 * Math.cos(4 * t) - Math.sin(5) * (t / 12);
+              return new THREE.Vector3(Math.sin(t * a) * z, Math.cos(t * a) * z, z);
+            },
+            f,
+            t,
+          ),
+        ];
 
         const line = new THREE.MeshLine();
         line.setPoints(points);
-        const material = new THREE.MeshLineMaterial({ lineWidth : 0.05, color: '#3498db' });
+        const material = new THREE.MeshLineMaterial({ lineWidth: 0.05, color: '#3498db' });
         const mesh = new THREE.Mesh(line, material);
         scene.add(mesh);
         renderer.render(scene, camera);
-      }
+      };
 
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
       camera.position.set(0, 0, 100);
       renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
       controls = new THREE.OrbitControls(camera, renderer.domElement);
-      window.addEventListener("resize", resize, false);
-      controls.addEventListener("change", () => {
+      window.addEventListener('resize', resize, false);
+      controls.addEventListener('change', () => {
         renderer.render(scene, camera);
       });
       resize();
@@ -64,17 +67,21 @@
   }
 </script>
 
+<svelte:head>
+  <title>Plotty - Butterfly</title>
+</svelte:head>
+
 <canvas bind:this={canvas} />
 <div class="menu">
-  <input type="range" min="-1" max="1" step="0.001" bind:value={a} on:input={generate}>
-  <input type="range" min="1" max="100" bind:value={f} on:input={generate}>
-  <input type="range" min="1" max="100" bind:value={t} on:input={generate}>
+  <input type="range" min="-1" max="1" step="0.001" bind:value={a} on:input={generate} />
+  <input type="range" min="1" max="100" bind:value={f} on:input={generate} />
+  <input type="range" min="1" max="100" bind:value={t} on:input={generate} />
 </div>
 
 <style>
-    .menu {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-    }
+  .menu {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+  }
 </style>
