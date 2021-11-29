@@ -1,5 +1,7 @@
 <script>
   import {
+    Accordion,
+    AccordionItem,
     Column,
     Content,
     Form,
@@ -13,10 +15,10 @@
   } from 'carbon-components-svelte';
   import katex from 'katex';
   import { onMount } from 'svelte';
-  import * as THREE from '../lib/three';
   import * as math from 'mathjs';
   import { muffle } from '../lib/utils';
 
+  let THREE;
   let canvas = null;
   let renderer = null;
   let scene = null;
@@ -26,7 +28,8 @@
   let material = null;
   let invalid = false;
   let mesh = null;
-  let formula = 'sin(x) + a';
+  let formula = 'sin(x) + a'; // abs(sin(x^x)/2^((x^x-pi/2)/pi))
+  let iterations = 300;
   $: parsed = muffle(() => math.parse(formula));
   $: compiled = muffle(() => parsed.compile());
   $: tex = parsed ? katex.renderToString(parsed.toTex(), { throwOnError: false }) : '';
@@ -37,10 +40,11 @@
           .map((node) => [node.name, 0]),
       )
     : {};
-  $: if (canvas) draw(formula);
+  $: if (canvas) draw(formula, iterations);
   onMount(setup);
 
-  function setup() {
+  async function setup() {
+    THREE = await import('$lib/three');
     renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
     camera = new THREE.OrthographicCamera(
       canvas.width / -1,
@@ -90,7 +94,7 @@
     try {
       const lx = camera.position.x - -camera.left / camera.zoom;
       const rx = camera.position.x + +camera.right / camera.zoom;
-      const step = (1 / camera.zoom) * 2;
+      const step = 1 / camera.zoom;
       const points = [];
 
       for (let x = lx; x <= rx; x += step) {
@@ -161,6 +165,12 @@
             {/each}
           </FormGroup>
         </Form>
+        <br />
+        <Accordion>
+          <AccordionItem title="Advanced">
+            <NumberInput label="Iterations" value={iterations} />
+          </AccordionItem>
+        </Accordion>
       </Column>
     </Row>
   </Grid>
