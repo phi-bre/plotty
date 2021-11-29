@@ -16,27 +16,7 @@
   } from 'carbon-components-svelte';
 </script>
 
-<Content>
-  <!--  <Grid>-->
-  <!--    <Row>-->
-  <!--      <Column>-->
-  <!--        <Tile>-->
-  <!--          asdas-->
-  <!--        </Tile>-->
-  <!--      </Column>-->
-  <!--      <Column>-->
-  <!--        <Tile>-->
-  <!--          asdas-->
-  <!--        </Tile>-->
-  <!--      </Column>-->
-  <!--      <Column>-->
-  <!--        <Tile>-->
-  <!--          asdas-->
-  <!--        </Tile>-->
-  <!--      </Column>-->
-  <!--    </Row>-->
-  <!--  </Grid>-->
-
+<Content style="background-color: transparent">
   <StructuredList selection ariaLabel="Plotty Pages">
     <StructuredListHead>
       <StructuredListRow head tabIndex={0}>

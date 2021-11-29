@@ -1,5 +1,16 @@
 <script>
-  import { Content, Header, NumberInput, TextInput, Tile } from 'carbon-components-svelte';
+  import {
+    Column,
+    Content,
+    Form,
+    FormGroup,
+    Grid,
+    Header,
+    NumberInput,
+    Row,
+    TextInput,
+    Tile,
+  } from 'carbon-components-svelte';
   import katex from 'katex';
   import { onMount } from 'svelte';
   import * as THREE from '../lib/three';
@@ -120,25 +131,37 @@
 
 <Header href="/" company="plotty —" platformName="Formula" />
 
-<Content>
-  <TextInput
-    id="formula"
-    invalidText="Your formula seems invalid"
-    labelText="Formula"
-    placeholder="2 + 2"
-    {invalid}
-    bind:value={formula}
-  />
-  {#each Object.entries(scope) as [variable, value]}
-    <NumberInput
-      label={variable}
-      {value}
-      on:input={(e) => setScopeValue(variable, e.target.value)}
-      on:change={(e) => setScopeValue(variable, e.detail)}
-    />
-  {/each}
-  <Tile>{@html tex}</Tile>
-  <Tile style="padding: 0">
-    <canvas bind:this={canvas} style="width: 100%; height: 100%" />
-  </Tile>
+<Content style="background-color: transparent">
+  <Grid fullWidth>
+    <Row>
+      <Column style="min-height: 80vh">
+        <canvas bind:this={canvas} style="width: 100%; height: 100%" />
+      </Column>
+      <Column style="max-width: 340px">
+        <TextInput
+          id="formula"
+          labelText="Formula"
+          invalidText="Your formula seems invalid"
+          placeholder="2 + 2"
+          {invalid}
+          bind:value={formula}
+        />
+        <Tile style="display: flex; justify-content: center; align-items: center">
+          {@html tex}
+        </Tile>
+        <br />
+        <Form>
+          <FormGroup legendText="Variables {Object.keys(scope).join()}">
+            {#each Object.entries(scope) as [variable, value]}
+              <NumberInput
+                {value}
+                on:input={(e) => setScopeValue(variable, e.target.value)}
+                on:change={(e) => setScopeValue(variable, e.detail)}
+              />
+            {/each}
+          </FormGroup>
+        </Form>
+      </Column>
+    </Row>
+  </Grid>
 </Content>
