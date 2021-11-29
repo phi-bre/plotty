@@ -1,53 +1,93 @@
 <script>
-  import { Content, Header, TextInput, Tile } from 'carbon-components-svelte';
+  import { Content, Header, NumberInput, Slider, TextInput, Tile } from "carbon-components-svelte";
   // import katex from "katex";
-  import * as math from 'mathjs';
   import { onMount } from 'svelte';
+  import * as THREE from '../lib/three';
+  import * as math from 'mathjs';
 
-  let iterations = 1000;
-  let formula = 'sin(x) + 40';
+  let formula = 'sin(x)';
   let invalid = false;
   let canvas = null;
-
-  // function expression(value) {
-  //   return katex.renderToString(formula, { throwOnError: false });
-  // }
-
-  // function solution(value) {
-  //   invalid = false;
-  //   try {
-  //     return math.evaluate(formula, { a: 10 });
-  //   } catch {
-  //     invalid = true;
-  //     return "";
-  //   }
-  // }
+  let renderer = null;
+  let scene = null;
+  let camera = null;
+  let controls = null;
+  let geometry = null;
+  let material = null;
+  let mesh = null;
 
   function draw(formula) {
     invalid = false;
     try {
       const code = math.compile(formula);
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const points = [];
+      const lx = camera.position.x - -camera.left / camera.zoom;
+      const rx = camera.position.x + +camera.right / camera.zoom;
+      // const ly = camera.position.y - -camera.top / camera.zoom;
+      // const ry = camera.position.y + +camera.bottom / camera.zoom;
+      const step = 1 / camera.zoom;
 
-      ctx.strokeStyle = '#5dadff';
-      ctx.beginPath();
-      for (let i = 0; i < iterations; i++) {
-        const x = (canvas.width * i) / iterations;
-        const y = -code.evaluate({ x }) + canvas.height;
-        ctx.lineTo(x, y, 1, 1);
+      for (let x = lx; x <= rx; x += step) {
+        const y = -code.evaluate({ x });
+        points.push(new THREE.Vector3(x, y));
       }
-      ctx.stroke();
-    } catch {
+
+      geometry.setFromPoints(points);
+      renderer.render(scene, camera);
+    } catch (e) {
+      console.log(e);
       invalid = true;
     }
   }
 
-  onMount(() => {
     draw(formula);
+  onMount(() => {
+    renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
+    camera = new THREE.OrthographicCamera(
+      canvas.width / -1,
+      canvas.width / +1,
+      canvas.height / -1,
+      canvas.height / +1,
+      Number.MIN_VALUE,
+      Number.MAX_VALUE,
+    );
+    camera.lookAt(0, 0, 0);
+
+    controls = new THREE.OrbitControls(camera, canvas);
+    controls.enableRotate = false;
+    controls.screenSpacePanning = true;
+
+    scene = new THREE.Scene();
+
+    const grid = new THREE.GridHelper(1000, 2 * 4, 0x333333, 0x151515);
+    grid.rotateX(Math.PI / 2);
+    scene.add(grid);
+
+    material = new THREE.LineBasicMaterial({ color: 0x5dadff });
+    geometry = new THREE.BufferGeometry();
+    mesh = new THREE.Line(geometry, material);
+    mesh.frustumCulled = false;
+    scene.add(mesh);
+
+    controls.addEventListener('change', () => {
+      draw(formula);
+    });
+
+    const resize = () => {
+      const parent = canvas.parentElement.getBoundingClientRect();
+      canvas.width = parent.width;
+      canvas.height = parent.height;
+      camera.aspect = canvas.width / canvas.height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(canvas.width, canvas.height);
+      draw(formula);
+    };
+    window.addEventListener('resize', resize);
+
+    resize();
   });
 
-  $: draw(formula);
+  $: if (canvas) draw(formula);
 </script>
 
 <svelte:head>
@@ -76,7 +116,7 @@
   <!--  <Tile>-->
   <!--    {@html solution(formula)}-->
   <!--  </Tile>-->
-  <Tile>
-    <canvas bind:this={canvas} width="400" height="400" />
+  <Tile style="padding: 0">
+    <canvas bind:this={canvas} style="width: 100%; height: 100%" />
   </Tile>
 </Content>
