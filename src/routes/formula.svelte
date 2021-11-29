@@ -14,9 +14,10 @@
     Tile,
   } from 'carbon-components-svelte';
   import katex from 'katex';
+  import 'katex/dist/katex.css';
   import { onMount } from 'svelte';
   import * as math from 'mathjs';
-  import { muffle } from '../lib/utils';
+  import { muffle } from '$lib/utils';
 
   let THREE;
   let canvas = null;
@@ -32,7 +33,9 @@
   let iterations = 300;
   $: parsed = muffle(() => math.parse(formula));
   $: compiled = muffle(() => parsed.compile());
-  $: tex = parsed ? katex.renderToString(parsed.toTex(), { throwOnError: false }) : '';
+  $: tex = parsed
+    ? katex.renderToString(parsed.toTex(), { throwOnError: false, displayMode: true, output: 'html' })
+    : '';
   $: scope = parsed
     ? Object.fromEntries(
         parsed
@@ -118,19 +121,6 @@
 
 <svelte:head>
   <title>Plotty - Formula</title>
-  <script
-    nomodule
-    defer
-    src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.js"
-    integrity="sha384-lhN3C1JSmmvbT89RGOy6nC8qFBS8X/PLsBWIqiNdD4WGNsYOWpS2Il0x4TBrK8E2"
-    crossorigin="anonymous">
-  </script>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.css"
-    integrity="sha384-WsHMgfkABRyG494OmuiNmkAOk8nhO1qE+Y6wns6v+EoNoTNxrWxYpl5ZYWFOLPCM"
-    crossorigin="anonymous"
-  />
 </svelte:head>
 
 <Header href="/" company="plotty —" platformName="Formula" />
