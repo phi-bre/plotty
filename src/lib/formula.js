@@ -126,8 +126,24 @@ export default function (canvas) {
             } else {
               return `${node.args[0].toString(options)} ${node.op} ${node.args[1].toString(options)}`;
             }
+          } else if (node.type === 'FunctionNode') {
+            return `${node.name}(${node.args.map((arg) => arg.toString(options)).join(', ')})`;
+          } else if (node.type === 'ParenthesisNode') {
+            return `(${node.content.toString(options)})`;
+          } else if (node.type === 'SymbolNode') {
+            if (node.name === 'pi' || node.name === 'PI') {
+              return 3.141592653589793;
+            } else if (node.name === 'e' || node.name === 'E') {
+              return 2.718281828459045;
+            } else if (node.name === 'phi') {
+              return 1.618033988749895;
+            } else {
+              return node.name;
+            }
+          } else {
+            return node.toString();
           }
-          return node.toString();
+          // TODO: handle other node types not supported by GLSL
         },
       });
       material.vertexShader = `
@@ -139,16 +155,12 @@ export default function (canvas) {
           gl_Position = projectionMatrix * modelViewMatrix * vec4(x, -y, 0, 1.0);
         }
       `;
-      mesh.material = material;
       mesh.material.needsUpdate = true;
 
       store.update((state) => {
         Object.keys(scope).forEach((key) => {
           state.scope[key] ??= scope[key];
-          material.uniforms[key] = {
-            type: 'float',
-            value: state.scope[key],
-          };
+          material.uniforms[key] = state.scope[key];
         });
 
         state.formula = formula;
@@ -167,7 +179,7 @@ export default function (canvas) {
     store.update((state) => {
       state.scope[name] = math.round(value, 2);
       material.uniforms[name] = state.scope[name];
-      mesh.material.needsUpdate = true;
+      material.needsUpdate = true;
       return state;
     });
   }
