@@ -1,30 +1,30 @@
 <script>
   import {
     Canvas,
-    Group, Mesh,
+    Group,
+    Mesh,
     MeshInstance,
     OrbitControls,
     OrthographicCamera,
     PerspectiveCamera,
-  } from '@threlte/core';
+  } from "@threlte/core";
   import {
     BoxBufferGeometry,
     EdgesGeometry,
     LineBasicMaterial,
-    LineSegments, MeshBasicMaterial, TorusGeometry, Vector2, Vector3,
+    LineSegments,
+    MeshBasicMaterial,
+    TorusGeometry,
     Vector4,
-  } from 'three';
-  import Mandeldot from '$lib/Mandeldot.svelte';
-  import Mandelbrot from '$lib/Mandelbrot.svelte';
-  import PositionPicker from '$lib/PositionPicker.svelte';
-  import { writable } from 'svelte/store';
+  } from "three";
+  import Mandeldot from "$lib/Mandeldot.svelte";
+  import Mandelbrot from "$lib/Mandelbrot.svelte";
+  import PositionPicker from "$lib/PositionPicker.svelte";
 
   let rotate = true;
   let imaginary = true;
   let depth = 256;
   let resolution = 128;
-  let julia = false;
-  let target = writable(new Vector2());
   let point = new Vector4();
   let camera = null;
 
@@ -45,9 +45,8 @@
     <span class="font-mono text-xs">resolution: {resolution}</span>
     <span class="font-mono text-xs">points: {resolution ** 3}</span>
     <span class="font-mono text-xs">depth: {depth}</span>
-    <span class="font-mono text-xs">rotate: <input type="checkbox" bind:checked={rotate}/></span>
-    <span class="font-mono text-xs">imaginary: <input type="checkbox" bind:checked={imaginary}/></span>
-    <span class="font-mono text-xs">julia: <input type="checkbox" bind:checked={julia}/></span>
+    <span class="font-mono text-xs">rotate: <input type="checkbox" bind:checked={rotate} /></span>
+    <span class="font-mono text-xs">imaginary: <input type="checkbox" bind:checked={imaginary} /></span>
   </div>
 
   <div class="fixed top-4 right-4 w-96 h-96 border-shark-400 border-2 rounded">
@@ -77,19 +76,7 @@
         />
       </OrthographicCamera>
 
-      {#if julia}
-        <PositionPicker position={target}>
-          <Mandelbrot {depth} />
-          <Mesh
-            position={$target}
-            scale={(1 / (camera?.zoom ?? 0)) * 100}
-            geometry={new TorusGeometry(0.05, 0.01, 16, 100)}
-            material={new MeshBasicMaterial({ color: 0x888888, alphaTest: 0.5, transparent: true })}
-          />
-        </PositionPicker>
-      {:else}
-        <Mandelbrot {depth} />
-      {/if}
+      <Mandelbrot {depth} />
     </Canvas>
   </div>
 
@@ -104,7 +91,7 @@
     </PerspectiveCamera>
 
     <Group frustumCulled={false} rotation={{ x: Math.PI / 2 }}>
-      <Mandeldot {resolution} {point} {depth} julia={julia ? $target : undefined} {imaginary} />
+      <Mandeldot {resolution} {point} {depth} {imaginary} />
     </Group>
 
     <MeshInstance mesh={box} />
