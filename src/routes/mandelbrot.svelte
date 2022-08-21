@@ -1,93 +1,53 @@
-<script>
-  import { onMount } from 'svelte';
-  import { browser } from '$app/env';
-  import { mandelbrot } from '../lib/algorithms';
+<script lang="ts">
+  import { writable } from 'svelte/store';
+  import { Canvas, Mesh, OrbitControls, OrthographicCamera } from '@threlte/core';
+  import { MeshBasicMaterial, TorusGeometry, Vector3 } from 'three';
+  import { Text } from '@threlte/extras';
+  import Mandelbrot from '$lib/Mandelbrot.svelte';
+  import Julia from '$lib/Julia.svelte';
+  import PositionPicker from '$lib/PositionPicker.svelte';
+  import font from '../assets/JetBrainsMono-Regular.ttf';
 
-  let canvas, resize, generate, interval, THREE;
-  let scene, camera, renderer, controls;
-  let precision = 300,
-    depth = 50,
-    batch = 10000;
-
-  if (browser) {
-    onMount(async () => {
-      THREE = await import('../lib/three');
-
-      resize = () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        // renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.render(scene, camera);
-      };
-
-      generate = () => {
-        scene.remove(...scene.children);
-        const iterator = mandelbrot(precision, depth);
-        const material = new THREE.PointsMaterial({
-          size: 1,
-          color: 'white',
-          sizeAttenuation: false,
-          opacity: 0.1,
-          transparent: true,
-        });
-
-        clearInterval(interval);
-        interval = setInterval(() => {
-          const geometry = new THREE.BufferGeometry();
-          const points = [];
-
-          for (let i = 0; i < batch; i++) {
-            const { done, value } = iterator.next();
-            if (done) {
-              clearInterval(interval);
-              break;
-            }
-            points.push(new THREE.Vector3(...value));
-          }
-          geometry.setFromPoints(points);
-          const mesh = new THREE.Points(geometry, material);
-          mesh.scale.addScalar(100);
-          scene.add(mesh);
-          renderer.render(scene, camera);
-        }, 1);
-      };
-
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.0000001, 1000);
-      camera.position.set(0, 0, 100);
-      renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
-      controls = new THREE.OrbitControls(camera, renderer.domElement);
-      window.addEventListener('resize', resize, false);
-      controls.addEventListener('change', () => {
-        renderer.render(scene, camera);
-      });
-      resize();
-      generate();
-    });
-  }
+  let point = writable(new Vector3());
+  let camera = null;
+  let depth = 300;
 </script>
 
 <svelte:head>
   <title>Plotty - Mandelbrot</title>
 </svelte:head>
 
-<canvas bind:this={canvas} />
-<div class="menu">
-  <input type="range" min="1" max="100000" bind:value={batch} on:input={generate} />
-  <input type="range" min="1" max="1000" bind:value={precision} on:input={generate} />
-  <input type="range" min="4" max="1000" bind:value={depth} on:input={generate} />
+<div class="overflow-hidden w-full h-full min-h-screen">
+  <div
+    class="fixed top-4 right-4 w-[80vh] h-[80vh] rounded overflow-hidden scale-50 translate-x-1/4 -translate-y-1/4 hover:translate-x-0 hover:translate-y-0 hover:scale-100 hover:bg-shark-500 transition-all"
+  >
+    <Canvas>
+      <OrthographicCamera zoom={200} near={Number.MIN_VALUE}>
+        <OrbitControls enableRotate={false} screenSpacePanning={true} />
+      </OrthographicCamera>
+
+      <Julia point={$point} {depth} />
+    </Canvas>
+  </div>
+
+  <Canvas>
+    <OrthographicCamera zoom={200} near={Number.MIN_VALUE} far={1000000} bind:camera>
+      <OrbitControls
+        enableRotate={false}
+        screenSpacePanning={true}
+        on:change={() => (camera = camera)}
+      />
+    </OrthographicCamera>
+
+    <PositionPicker position={point}>
+      <Text text="Mandelbrot" position={{ x: -2, y: 2 }} {font} />
+      <Mandelbrot {depth} />
+      <Mesh
+        position={$point}
+        scale={(1 / (camera?.zoom ?? 0)) * 100}
+        geometry={new TorusGeometry(0.05, 0.01, 16, 100)}
+        material={new MeshBasicMaterial({ color: 0x888888, alphaTest: 0.5, transparent: true })}
+      />
+    </PositionPicker>
+  </Canvas>
 </div>
-
-<style>
-  .menu {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-  }
-
-  canvas {
-    min-width: 100vw;
-    min-height: 100vh;
-  }
-</style>

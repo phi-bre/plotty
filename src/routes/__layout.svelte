@@ -1,6 +1,5 @@
 <script>
-  import { Header } from 'carbon-components-svelte';
+  import '../app.css';
 </script>
 
-<Header company="plotty" />
 <slot />
