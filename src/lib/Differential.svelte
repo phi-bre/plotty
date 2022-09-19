@@ -1,20 +1,24 @@
 <script>
   import { Line, useThrelte } from '@threlte/core';
-  import { ShaderMaterial, Vector2, Vector4 } from 'three';
+  import {
+    BufferAttribute,
+    BufferGeometry,
+    ShaderMaterial,
+    Vector2,
+    Vector3,
+    Vector4,
+  } from 'three';
 
   export let formula = '(x * x - 2.0) / (y * y + 1.0) * sin(x - 2.0) + sin(y)';
-  export let precision = 100;
   export let point = new Vector2(0, 0);
 
   const { size } = useThrelte();
-  const points = [];
+  $: points = new Array(resolution).fill(0).map((_, i) => {
+    return new Vector3(i - resolution / 2, 0);
+  });
 
-  $: {
-    points.length = 0;
-    for (let i = 0; i < precision; i++) {
-      points.push([i - precision / 2, 0]);
-    }
-  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(points, 1));
 
   $: material = new ShaderMaterial({
     uniforms: {
@@ -31,22 +35,16 @@
       }
 
       void main() {
-        vec2 local = point;
-
-        // float aspect = resolution.y / resolution.x;
-        // vec2 viewport = vec2(aspect, 1) * zoom;
-        // vec2 position = target * vec2(1, -1) / viewport / (resolution / 2.0);
-        // int direction = (int(position.x) < ${precision} / 2) ? 1 : -1;
-        // float step = (2.0 / viewport.x / ${precision}.0) * 2.0 * float(direction);
-
         int index = int(position.x);
-        int direction = (index < ${precision} / 2) ? 1 : -1;
+        int direction = (index < resolution.x / 2.0) ? 1 : -1;
         float step = -0.1 * float(direction);
 
-        for (int i = 0; i < ${precision} / 2; i++) {
+        vec2 local = point;
+
+        for (int i = 0; i < resolution.x / 2.0; i++) {
           local += vec2(step, step * formula(local.x, local.y));
 
-          if (!(i < (${precision} / 2 - index) * direction)) {
+          if (!(i < (resolution.x / 2.0 - index) * direction)) {
             break;
           }
         }

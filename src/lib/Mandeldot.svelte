@@ -1,36 +1,49 @@
 <script>
   import {
-    BufferAttribute,
-    BufferGeometry,
     Points,
     ShaderMaterial,
     Color,
     Vector4,
+    Scene,
+    WebGLRenderTarget,
+    OrthographicCamera,
   } from 'three';
   import { MeshInstance } from '@threlte/core';
-  import { Disposables } from '@threlte/extras';
+  import { IndexedBufferGeometry } from '$lib/utils.js';
 
   export let depth = 1000;
   export let resolution = 100;
   export let point = new Vector4(0, 0, 0, 1);
   export let imaginary = true;
+  export let randomize = true;
 
-  let indexes = new Uint32Array(0);
-  let geometry = new BufferGeometry();
+  // const threlte = useThrelte();
+  // const scene = new Scene();
+  // const texture = new WebGLRenderTarget(1, resolution ** 3);
+  // // texture.texture.minFilter = THREE.LinearFilter;
+  // const camera = new OrthographicCamera(0, resolution ** 3, 0, 1);
+  // threlte.renderer.render(scene, camera, texture, true);
+
+  let previousResolution = 0;
+  let geometry = new IndexedBufferGeometry();
   let material = new ShaderMaterial({
     transparent: true,
     uniforms: {
       imaginary: { value: imaginary },
+      randomize: { value: randomize },
       depth: { value: depth },
       point: { value: point },
       resolution: { value: resolution },
       color: { value: new Color(0xffffff) },
+      // texture: { value: texture.texture },
     },
     vertexShader: `
       uniform vec4 point;
       uniform bool imaginary;
+      uniform bool randomize;
       uniform int resolution;
       uniform int depth;
+      uniform sampler2D texture;
 
       varying float intensity;
 
@@ -48,7 +61,7 @@
         ) * error - 1.0;
 
         vec3 voxel = position * point.w + point.xyz;
-        voxel += (error) * (rand(voxel.xy) - 1.0);
+        if (randomize) voxel += (error * 2.0) * (rand(voxel.xy) - 1.0);
 
         int iteration;
         vec2 z;
@@ -67,6 +80,9 @@
         }
 
         voxel.z = imaginary ? zz.x : zz.y;
+        intensity /= float(depth);
+
+        if (intensity < 0.01) return;
 
         gl_PointSize = 1.0;
         gl_Position = projectionMatrix * modelViewMatrix * vec4((voxel - point.xyz) / point.w, 1.0);
@@ -79,38 +95,24 @@
       varying float intensity;
 
       void main() {
-        gl_FragColor = vec4(color, intensity / float(depth));
+        gl_FragColor = vec4(color, intensity);
       }
     `,
   });
   let mesh = new Points(geometry, material);
 
-  $: if (indexes.length !== resolution) {
-    const count = resolution ** 3;
-
-    if (indexes.length < count) {
-      const temp = new Uint32Array(count);
-      temp.set(indexes);
-      geometry.setAttribute('position', new BufferAttribute(temp, 1));
-      indexes = temp;
-      geometry.setDrawRange(0, count);
-    } else if (indexes.length > count) {
-      geometry.setDrawRange(0, count);
-    }
-
-    mesh = mesh;
+  $: if (previousResolution !== resolution) {
+    geometry.length = resolution ** 3;
+    previousResolution = resolution;
   }
 
   $: {
     material.uniforms.resolution.value = resolution;
     material.uniforms.depth.value = depth;
+    material.uniforms.randomize.value = randomize;
     material.uniforms.imaginary.value = imaginary;
     material.uniforms.point.value = point;
-    material.needsUpdate = true;
-    mesh = mesh;
   }
 </script>
 
-<Disposables disposables={[mesh]}>
-  <MeshInstance frustumCulled={false} {mesh} scale={0.5}/>
-</Disposables>
+<MeshInstance frustumCulled={false} {mesh} scale={0.5} />
