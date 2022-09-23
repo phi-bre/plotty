@@ -31,14 +31,11 @@
     colors[j] = temp;
   }
 
+  export let enableSliders;
+  export let enableBernstein;
   export let resolution = 100;
   export let parameter = 0.5;
-  export let controls = [
-    new Vector3(0.30959752321981426, 0.7575757575757576),
-    new Vector3(0.2777777777777778, 0.3),
-    new Vector3(1.27548209366391185, 0.1510574018126888),
-    new Vector3(0.14705882352941177, 0.2173913043478261, 1),
-  ];
+  export let controls = [];
 
   function bezier(controls, resolution) {
     const points = [];
@@ -116,42 +113,39 @@
 
   $: curve = bezier(controls, resolution);
   $: sliders = triangulate(controls, parameter);
-  $: point = sliders[sliders.length - 1][0];
   $: vectors = bernstein(controls, parameter);
-
-  let velocity = 0.001;
-
-  setInterval(() => {
-    parameter += velocity;
-    if (parameter < 0) {
-      parameter = 0;
-      velocity = -velocity;
-    }
-    if (parameter > 1) {
-      parameter = 1;
-      velocity = -velocity;
-    }
-  });
+  $: point = sliders[sliders.length - 1][0];
 
   let selected;
+  let hovered;
+  let meshes = [];
 </script>
 
 <Mesh geometry={new SphereGeometry(0.005)} position={point} />
 <Line points={curve} />
 
-<DashedLineSegments segments={sliders.flatMap(segment)} />
-<DashedLineSegments segments={vectors} colors={colors.flatMap((color) => [color, color])} />
+{#if enableSliders}
+  <DashedLineSegments segments={sliders.flatMap(segment)} />
+{/if}
+
+{#if enableBernstein}
+  <DashedLineSegments segments={vectors} {colors} />
+{/if}
 
 {#each controls as control, index}
   <Mesh
     position={control}
     geometry={new SphereGeometry(0.005)}
-    material={new MeshBasicMaterial({ color: colors[index] })}
+    material={new MeshBasicMaterial({ color: hovered === index ? 'red' : colors[index] })}
     interactive
+    bind:mesh={meshes[index]}
+    on:pointerenter={() => (hovered = index)}
+    on:pointerleave={() => (hovered = null)}
     on:click={() => (selected = index)}
+    on:pointerup={() => (selected = null)}
   >
     {#if selected === index}
-      <TransformControls />
+      <TransformControls on:change={() => (controls[index] = meshes[index].position)} />
     {/if}
   </Mesh>
 {/each}
