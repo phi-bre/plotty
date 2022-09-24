@@ -6,7 +6,7 @@
   import Mandelbrot from '$lib/Mandelbrot.svelte';
   import Julia from '$lib/Julia.svelte';
   import PositionPicker from '$lib/PositionPicker.svelte';
-  import font from '../assets/JetBrainsMono-Regular.ttf';
+  import font from '../../assets/JetBrainsMono-Regular.ttf';
 
   let point = writable(new Vector3());
   let camera = null;

@@ -10,10 +10,5 @@ export default {
   ],
   kit: {
     adapter: vercel(),
-    vite: {
-      ssr: {
-        noExternal: ['@fortawesome/free-brands-svg-icons', 'three', 'troika-three-text'],
-      },
-    },
   },
 };

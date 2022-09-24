@@ -35,6 +35,11 @@
       badge="2D"
       description="Visualizes differential equations."
     />
-    <Project name="Bézier" href="/plot/bezier" badge="3D" description="A Bézier curves plotter." />
+    <Project
+      name="Bézier"
+      href="/bezier"
+      badge="3D"
+      description="A Bézier curves plotter with animations."
+    />
   </div>
 </section>
