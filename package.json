@@ -11,7 +11,8 @@
   "dependencies": {
     "@threlte/core": "^4.3.2",
     "@threlte/extras": "^4.3.0",
-    "three": "^0.144.0"
+    "three": "^0.144.0",
+    "mathjs": "^11.2.1"
   },
   "devDependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.2.0",

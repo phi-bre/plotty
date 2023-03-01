@@ -1,5 +1,5 @@
 <script>
-  import BuyMeACoffee from '$lib/BuyMeACoffee.svelte';
+  import BuyMeACoffee from '$lib/ui/BuyMeACoffee.svelte';
 </script>
 
 <header class="lg:pt-24 content select-none flex justify-between items-center">

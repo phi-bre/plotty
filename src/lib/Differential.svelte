@@ -13,8 +13,8 @@
   export let point = new Vector2(0, 0);
 
   const { size } = useThrelte();
-  $: points = new Array(resolution).fill(0).map((_, i) => {
-    return new Vector3(i - resolution / 2, 0);
+  $: points = new Array($size.width).fill(0).map((_, i) => {
+    return new Vector3(i - $size.width / 2, 0);
   });
 
   const geometry = new BufferGeometry();
@@ -36,15 +36,15 @@
 
       void main() {
         int index = int(position.x);
-        int direction = (index < resolution.x / 2.0) ? 1 : -1;
+        int direction = (index < int(resolution.x) / 2) ? 1 : -1;
         float step = -0.1 * float(direction);
 
         vec2 local = point;
 
-        for (int i = 0; i < resolution.x / 2.0; i++) {
+        for (int i = 0; i < int(resolution.x) / 2; i++) {
           local += vec2(step, step * formula(local.x, local.y));
 
-          if (!(i < (resolution.x / 2.0 - index) * direction)) {
+          if (!(i < (int(resolution.x) / 2 - index) * direction)) {
             break;
           }
         }

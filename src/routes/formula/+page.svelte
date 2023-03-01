@@ -24,8 +24,8 @@
   </div>
 
   <Canvas>
-    <OrthographicCamera zoom={50} near={Number.MIN_VALUE} far={1000000}>
-      <OrbitControls enableRotate={false} screenSpacePanning={true} />
+    <OrthographicCamera position={{ x: 0, y: 0, z: 3 }} lookAt={{ x: 0, y: 0, z: 0 }} zoom="500">
+      <OrbitControls />
     </OrthographicCamera>
 
     <!--    <MeshInstance mesh={new AxesHelper(10000000)} />-->
@@ -33,6 +33,7 @@
       mesh={new GridHelper(100, 100, new Color(0x3333333), new Color(0x080808))}
       rotation={{ x: Math.PI / 2 }}
     />
+
     <Graph {formula} />
   </Canvas>
 </div>

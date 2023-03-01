@@ -1,6 +1,6 @@
 <script>
-  import Project from '$lib/Project.svelte';
-  import Header from '$lib/Header.svelte';
+  import Project from '$lib/ui/Project.svelte';
+  import Header from '$lib/ui/Header.svelte';
 </script>
 
 <svelte:head>
