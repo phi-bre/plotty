@@ -43,20 +43,22 @@
       }
 
       void main() {
-        float error = 2.0 / float(resolution);
-
+        float s = float(gl_VertexID) / float(resolution);
+        float i = 0.0;
+        float x = rand(vec2(s, i));
         vec3 position = vec3(
-          gl_VertexID % resolution,
-          gl_VertexID / resolution % resolution,
-          gl_VertexID / resolution / resolution % resolution
-        ) * error - 1.0;
-
-        vec3 voxel = position * point.w + point.xyz;
-        if (randomize) voxel += (error * 2.0) * (rand(voxel.xy) - 1.0);
-        voxel.y = f(voxel);
+          x,
+          0.0,
+          rand(vec2(s, i + 0.1))
+        );
+        position = position * point.w + point.xyz - point.w / 2.0;
+        position.y = f(position);
+        if (position.y > point.w / 2.0 || position.y < -point.w / 2.0) {
+          return;
+        }
 
         gl_PointSize = 1.0;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4((voxel - point.xyz) / point.w, 1.0);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4((position - point.xyz), 1.0);
       }
     `;
     material.fragmentShader = `
