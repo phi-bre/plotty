@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry } from 'three';
+import { BufferAttribute, BufferGeometry, MeshNormalMaterial } from 'three';
 
 export class IndexedBufferGeometry extends BufferGeometry {
   constructor(resolution = 0) {
@@ -18,4 +18,8 @@ export class IndexedBufferGeometry extends BufferGeometry {
       this.setDrawRange(0, value);
     }
   }
+}
+
+export class GraphShaderMaterial extends MeshNormalMaterial {
+  onBeforeCompile() {}
 }

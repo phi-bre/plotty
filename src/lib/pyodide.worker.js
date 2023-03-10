@@ -26,7 +26,8 @@ onmessage = async (message) => {
     const compiled = output
       ?.toString()
       .replace(/(\d+)(\.(\d+))?/g, '$1.$3')
-      .replace(/fabs/g, 'abs');
+      .replace(/fabs/g, 'abs')
+      .replace('I', '1.0');
 
     if (compiled.includes('/* Not supported in C: */')) {
       throw new Error('Not supported in C');

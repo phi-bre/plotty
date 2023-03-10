@@ -19,11 +19,16 @@
     Mesh,
     Vector4,
   } from 'three';
-  import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
+  import PyodideWorker from '$lib/pyodide.worker?worker';
   import { browser } from '$app/environment';
 
-  let randomize = true;
+  let pyodide;
+
+  if (browser) {
+    pyodide = new PyodideWorker();
+  }
+
+  let randomize = false;
   let resolution = 100;
   let point = new Vector4(0, 0, 0, 1);
   let controls;
@@ -38,7 +43,7 @@
 
   let box = new LineSegments(
     new EdgesGeometry(new BoxBufferGeometry(1, 1, 1)),
-    new LineBasicMaterial({ opacity: 0.2, transparent: true }),
+    new LineBasicMaterial({ opacity: 0.05, transparent: true }),
   );
   $: {
     box.position.set(point.x, point.y, point.z);
@@ -46,7 +51,7 @@
   }
 
   $: if (controls && camera) {
-    point.w = camera.position.distanceTo(controls.target) / 2;
+    point.w = camera.position.distanceTo(controls.target) / 1.5;
   }
 
   function change() {
@@ -54,7 +59,7 @@
       controls.target.x,
       controls.target.y,
       controls.target.z,
-      camera.position.distanceTo(controls.target) / 2,
+      camera.position.distanceTo(controls.target) / 1.5,
     );
   }
 </script>
@@ -74,30 +79,28 @@
 
     <hr class="border-shark" />
 
-    <label class="my-2 flex justify-between items-center">
-      randomize
-      <ToggleSwitch bind:checked={randomize} />
-    </label>
+    <!--    <label class="my-2 flex justify-between items-center">-->
+    <!--      randomize-->
+    <!--      <ToggleSwitch bind:checked={randomize} />-->
+    <!--    </label>-->
   </div>
 
-  <Canvas flat linear>
+  <Canvas>
     <!-- <OrthographicCamera position={{ x: 0, y: 0, z: 3 }} lookAt={{ x: 0, y: 0, z: 0 }} zoom="500">
       <OrbitControls />
     </OrthographicCamera> -->
 
-    <PerspectiveCamera
-      fov={60}
-      near={0.00001}
-      far={100000}
-      position={{ x: 3, y: 3, z: 3 }}
-      bind:camera
-    >
+    <PerspectiveCamera fov={60} position={{ x: 3, y: 3, z: 3 }} bind:camera>
       <OrbitControls autoRotate={rotate} screenSpacePanning on:change={change} bind:controls />
     </PerspectiveCamera>
 
+    <!--    <T.DirectionalLight castShadow position={[3, 10, 10]} />-->
+    <!--    <T.DirectionalLight position={[-3, 10, -10]} intensity={0.2} />-->
+    <!--    <T.AmbientLight intensity={0.2} />-->
+
     <MeshInstance mesh={box} />
 
-    <!-- <MeshInstance mesh={new AxesHelper(10000000)} /> -->
+    <MeshInstance mesh={new AxesHelper(10000)} />
     <!-- <Grid
       infiniteGrid
       fadeDistance={100000}
@@ -107,6 +110,16 @@
       followCamera={false}
     /> -->
 
-    <Graph {randomize} {resolution} {point} bind:formula bind:values />
+    <Graph {pyodide} {randomize} {resolution} {point} bind:formula bind:values />
+
+    <!--    <Graph-->
+    <!--      portal={false}-->
+    <!--      {pyodide}-->
+    <!--      {randomize}-->
+    <!--      resolution={resolution * 2}-->
+    <!--      point={point.clone().multiply(new Vector4(1, 1, 1, 10))}-->
+    <!--      bind:formula-->
+    <!--      bind:values-->
+    <!--    />-->
   </Canvas>
 </div>
