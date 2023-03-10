@@ -44,7 +44,9 @@
 </svelte:head>
 
 <Portal>
-  <div class="rounded bg-shark-600 bg-opacity-25 p-3 px-4 w-64">
+  <div
+    class="fixed top-4 left-4 rounded font-mono text-xs bg-shark-600 bg-opacity-25 p-3 px-4 w-64"
+  >
     <a href="/">
       <h2 class="mb-2">plotty<span class="text-malibu">.</span></h2>
     </a>

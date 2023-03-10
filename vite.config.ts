@@ -6,4 +6,7 @@ export default {
   ssr: {
     noExternal: ['@fortawesome/free-brands-svg-icons', 'three', 'troika-three-text', 'mathjs'],
   },
+  worker: {
+    format: 'es',
+  },
 };

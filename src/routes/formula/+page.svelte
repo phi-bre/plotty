@@ -1,4 +1,6 @@
 <script>
+  import Graph from '$lib/Graph.svelte';
+  import ToggleSwitch from '$lib/ui/ToggleSwitch.svelte';
   import {
     Canvas,
     MeshInstance,
@@ -6,9 +8,9 @@
     OrthographicCamera,
     PerspectiveCamera,
   } from '@threlte/core';
-  import Graph from '$lib/Graph.svelte';
   import { Grid } from '@threlte/extras';
   import {
+    AxesHelper,
     BoxBufferGeometry,
     BoxGeometry,
     EdgesGeometry,
@@ -17,13 +19,22 @@
     Mesh,
     Vector4,
   } from 'three';
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
 
-  let formula = `(2.0 * y) / (x * x + y * y)`;
   let randomize = true;
   let resolution = 100;
   let point = new Vector4(0, 0, 0, 1);
   let controls;
   let camera;
+  let rotate = false;
+  let formula;
+  let values;
+
+  // $: settings = $page.url.searchParams.get('settings');
+  // $: console.log(settings);
+  // $: if (browser) goto('?settings=' + encodeURIComponent(JSON.stringify({ formula, values })));
 
   let box = new LineSegments(
     new EdgesGeometry(new BoxBufferGeometry(1, 1, 1)),
@@ -53,56 +64,49 @@
 </svelte:head>
 
 <div class="overflow-hidden w-full h-full min-h-screen">
-  <div class="fixed">
-    <label>
-      <input
-        type="text"
-        class="bg-shark px-2 py-1 font-mono text-xs focus:border-malibu rounded border-2 border-shark-400  transition-colors outline-none"
-        bind:value={formula}
-      />
-    </label>
-    <label>
+  <div
+    id="target"
+    class="fixed top-4 left-4 rounded font-mono text-xs bg-shark-600 bg-opacity-25 p-3 px-4 w-96"
+  >
+    <a href="/">
+      <h2 class="mb-2">plotty<span class="text-malibu">.</span></h2>
+    </a>
+
+    <hr class="border-shark" />
+
+    <label class="my-2 flex justify-between items-center">
       randomize
-      <input
-        type="checkbox"
-        class="bg-shark px-2 py-1 font-mono text-xs focus:border-malibu rounded border-2 border-shark-400  transition-colors outline-none"
-        bind:checked={randomize}
-      />
-    </label>
-    <label>
-      resolution: {resolution}
-      <br />
-      <input
-        type="range"
-        class="bg-shark px-2 py-1 font-mono text-xs focus:border-malibu rounded border-2 border-shark-400  transition-colors outline-none"
-        bind:value={resolution}
-        min="10"
-        max="10000"
-      />
+      <ToggleSwitch bind:checked={randomize} />
     </label>
   </div>
 
-  <Canvas>
+  <Canvas flat linear>
     <!-- <OrthographicCamera position={{ x: 0, y: 0, z: 3 }} lookAt={{ x: 0, y: 0, z: 0 }} zoom="500">
       <OrbitControls />
     </OrthographicCamera> -->
 
-    <PerspectiveCamera fov={60} position={{ x: 3, y: 3, z: 3 }} bind:camera>
-      <OrbitControls screenSpacePanning on:change={change} bind:controls />
+    <PerspectiveCamera
+      fov={60}
+      near={0.00001}
+      far={100000}
+      position={{ x: 3, y: 3, z: 3 }}
+      bind:camera
+    >
+      <OrbitControls autoRotate={rotate} screenSpacePanning on:change={change} bind:controls />
     </PerspectiveCamera>
 
     <MeshInstance mesh={box} />
 
-    <!--    <MeshInstance mesh={new AxesHelper(10000000)} />-->
-    <!--    <Grid-->
-    <!--      infiniteGrid-->
-    <!--      fadeDistance={100}-->
-    <!--      sectionColor="#111"-->
-    <!--      sectionThickness={1}-->
-    <!--      cellThickness={0.5}-->
-    <!--      followCamera={false}-->
-    <!--    />-->
+    <!-- <MeshInstance mesh={new AxesHelper(10000000)} /> -->
+    <!-- <Grid
+      infiniteGrid
+      fadeDistance={100000}
+      sectionColor="#888888"
+      sectionThickness={1}
+      cellThickness={0.5}
+      followCamera={false}
+    /> -->
 
-    <Graph {formula} {randomize} {resolution} {point} />
+    <Graph {randomize} {resolution} {point} bind:formula bind:values />
   </Canvas>
 </div>
