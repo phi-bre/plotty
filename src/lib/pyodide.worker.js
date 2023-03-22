@@ -23,13 +23,13 @@ onmessage = async (message) => {
     const proxy = pyodide.runPython(message.data.formula);
     pyodide.globals.set('_', proxy);
     const output = pyodide.runPython(`C89CodePrinter().doprint(_)`);
-    const compiled = output
+    const glsl = output
       ?.toString()
       .replace(/(\d+)(\.(\d+))?/g, '$1.$3')
       .replace(/fabs/g, 'abs')
       .replace('I', '1.0');
 
-    if (compiled.includes('/* Not supported in C: */')) {
+    if (glsl.includes('/* Not supported in C: */')) {
       throw new Error('Not supported in C');
     }
 
@@ -41,10 +41,8 @@ onmessage = async (message) => {
       )
       .toJs();
 
-    console.log(symbols);
-
     postMessage({
-      compiled,
+      glsl,
       symbols,
     });
   } catch (error) {

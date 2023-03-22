@@ -7,13 +7,7 @@
     OrthographicCamera,
     PerspectiveCamera,
   } from '@threlte/core';
-  import {
-    BoxBufferGeometry,
-    EdgesGeometry,
-    LineBasicMaterial,
-    LineSegments,
-    Vector4,
-  } from 'three';
+  import { BoxGeometry, EdgesGeometry, LineBasicMaterial, LineSegments, Vector4 } from 'three';
   import Mandeldot from '$lib/Mandeldot.svelte';
   import Mandelbrot from '$lib/Mandelbrot.svelte';
 
@@ -26,7 +20,7 @@
   let camera = null;
 
   const box = new LineSegments(
-    new EdgesGeometry(new BoxBufferGeometry(1, 1, 1)),
+    new EdgesGeometry(new BoxGeometry(1, 1, 1)),
     new LineBasicMaterial({ opacity: 0.2, transparent: true }),
   );
 

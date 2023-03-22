@@ -15,7 +15,8 @@
     "pyodide": "^0.22.1",
     "codemirror": "^6.0.1",
     "@codemirror/highlight": "^0.19.8",
-    "@codemirror/lang-python": "^6.1.1"
+    "@codemirror/lang-python": "^6.1.1",
+    "mathjs": "^11.7.0"
   },
   "devDependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
